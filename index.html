@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>FLOXEL</title>
+		<style>
+			#canvas {
+				background: #000;
+				width: 800px;
+				height: 600px;
+			}
+			#debug {
+				background: #ccc;
+				width: 200px;
+				height: 600px;
+			}
+			
+			body {
+				margin: 0;
+				padding: 0;
+			}
+			
+			div {
+				float: left;
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="canvas"></div>
+		<div id="debug"><table>
+			<tr>
+				<td class="debug-name">Camera</td>
+				<td class="debug-info">(<span class="debug-camera-position"></span>)</td>
+			</tr>
+			<tr>
+				<td class="debug-name">Entity</td>
+				<td class="debug-info">
+					<span class="debug-entity-name"></span> 
+					<span class="debug-entity-id"></span>
+				</td>
+			</tr>
+			<tr>
+				<td class="debug-name">Mode</td>
+				<td class="debug-info">
+					<span class="debug-mode-id"></span> 
+					<button class="debug-mode" data-mode="-1">--</button>
+					<button class="debug-mode" data-mode="0">0</button>
+					<button class="debug-mode" data-mode="1">++</button>
+				</td>
+			</tr>
+			<tr>
+				<td class="debug-name">PlaceBlock</td>
+				<td class="debug-info">
+					<select class="debug-place-block"></select>
+				</td>
+			</tr>
+		</table></div>
+
+	</body>
+	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/Three.js"></script>
+	<script type="text/javascript" src="lib/Util.js"></script>
+	
+	<script type="text/javascript">
+		// ensure requestAnimationFrame is defined
+		window.requestAnimFrame = (function(){
+			return  window.requestAnimationFrame       ||
+					window.webkitRequestAnimationFrame ||
+					window.mozRequestAnimationFrame    ||
+					function( callback ){
+						window.setTimeout(callback, 1000 / 60);
+					};
+		})();
+		
+		//http://js-tut.aardon.de/js-tut/tutorial/position.html
+		function getElementPosition(element) {
+			var elem=element, tagname="", x=0, y=0;
+			
+			while((typeof(elem) == "object") && (typeof(elem.tagName) != "undefined")) {
+				y += elem.offsetTop;
+				x += elem.offsetLeft;
+				tagname = elem.tagName.toUpperCase();
+				
+				if(tagname == "BODY")
+				elem=0;
+		
+				if(typeof(elem) == "object") {
+					if(typeof(elem.offsetParent) == "object")
+					elem = elem.offsetParent;
+				}
+			}
+			
+			return {x: x, y: y};
+	   }
+	</script>
+	
+	<script type="text/javascript">
+		/* Pre-Initialization Section */
+		
+		var $canvas,$debug,T,U,W;
+		
+		$canvas = $('#canvas');
+		$debug = $('#debug');
+		T = THREE;
+		U = UTIL;
+		W  = {
+			pos: getElementPosition(document.getElementById("canvas")),
+			halfHeight: $canvas.height() / 2,
+			halfWidth: $canvas.width() / 2,
+			height: $canvas.height(),
+			width: $canvas.width()
+		};
+		
+	</script>
+	
+	<script type="text/javascript" src="js/settings.js"></script>
+	<script type="text/javascript" src="js/map.js"></script>
+	<script type="text/javascript" src="js/entities.js"></script>
+	<script type="text/javascript" src="js/events.js"></script>
+	
+	<script type="text/javascript" src="js/rendering.js"></script>
+	
+	<script type="text/javascript" src="js/main.js"></script>
+	
+	<script type="text/javascript">
+		/* Post-Initialization Section */
+		
+		// attach the render-supplied DOM element
+		$canvas.append(R.renderer.domElement);
+		
+		var i,$placeBlock,opt;
+		
+		$placeBlock = $('.debug-place-block');
+		opt ='';
+		
+		for (i=0;i<entities.length;i++) {
+			if (entities[i]) {
+				opt += '<option value="'+i+'"';
+				if (i === G.placeEntityID) opt += ' selected="selected"';
+				opt +='>'+entities[i].name+'('+i+')</option>';
+			}
+		}
+		$placeBlock.html(opt);
+		
+		$placeBlock.change(function(e) {
+			G.placeEntityID = parseInt($(this).val());
+		});
+		
+		$('.debug-mode').click(function(e) {
+			G.actionMode = parseInt($(this).data('mode'),10);
+		});
+	</script>
+</html>
