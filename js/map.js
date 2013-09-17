@@ -54,6 +54,6 @@ map[3] = [
 	[000,000,000,000,000,000,000,000,000,000]
 ];
 
-M = new UTIL.Array3(S.mapSize);
+// M = new UTIL.Array3(S.mapSize);
 
-M.init(map);
+// M.init(map);

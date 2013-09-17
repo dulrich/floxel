@@ -57,6 +57,13 @@
 					<select class="debug-place-block"></select>
 				</td>
 			</tr>
+			<tr>
+				<td class="debug-name">Map</td>
+				<td class="debug-info">
+					<button class="debug-map-load">Load</button>
+					<button class="debug-map-save">Save</button>
+				</td>
+			</tr>
 		</table></div>
 
 	</body>
@@ -95,7 +102,29 @@
 			}
 			
 			return {x: x, y: y};
-	   }
+		}
+		
+		// copy of jQuery.get/post shorthand method used by getJSON
+		// can't just use jQuery.post for postJSON because it does 
+		// not support contentType forcing
+		$.formJSON = function( url, selector, callback ) {
+			return jQuery.post( url, jQuery(selector).serialize(), callback, 'json' );
+		};
+		$.postJSON = function( url, data, callback ) {
+			if ( jQuery.isFunction( data ) ) {
+				callback = data;
+				data = {};
+			}
+				
+			return jQuery.ajax({
+				url: url,
+				type: 'POST',
+				contentType: 'application/json',
+				dataType: 'json',
+				data: JSON.stringify(data),
+				success: callback
+			});
+		};
 	</script>
 	
 	<script type="text/javascript">
@@ -153,5 +182,17 @@
 		$('.debug-mode').click(function(e) {
 			G.actionMode = parseInt($(this).data('mode'),10);
 		});
+		
+		$('.debug-map-load').click(function(e) {
+			$.getJSON(S.server,function(d) {
+				console.log(d);
+			});
+		});
+		$('.debug-map-save').click(function(e) {
+			$.postJSON(S.server,M.a,function(d) {
+				console.log(d);
+			});
+		});
+		
 	</script>
 </html>

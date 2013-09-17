@@ -108,8 +108,16 @@ F.update = function() {
 	R.camera.position.z += G.pan.z;
 }
 
-F.initMeshFromMap();
-F.initWorld();
+F.onMapLoaded = function(map) {
+	M = new UTIL.Array3(S.mapSize);
+	
+	M.init(map.data);
+	
+	F.initMeshFromMap();
+	F.initWorld();
+};
+
+$.getJSON(S.server,F.onMapLoaded);
 
 window.setInterval(F.update, 1000 / 60);
 
