@@ -90,7 +90,9 @@ E.mouseDown = function(e) {
 		
 		grid.addSelf(F.flipY(intersects[0].face.normal));
 		
-		M.set(grid,G.placeEntityID);
+		M.set(grid,{
+			entityID: G.placeEntityID
+		});
 		
 		G.mesh.set(grid,F.meshFromMap(grid));
 		if (G.mesh.get(grid)) R.scene.add(G.mesh.get(grid));

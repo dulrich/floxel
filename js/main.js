@@ -1,4 +1,4 @@
-var F,G,MODES;
+var F,G,M,MODES;
 
 MODES = {
 	add: 1,
@@ -83,13 +83,13 @@ F.meshFromMap = function(v) {
 	
 	tMesh = new T.Mesh(
 		new T.CubeGeometry(S.scale.x,S.scale.y,S.scale.z,seg.x,seg.y,seg.z),
-		F.makeMaterial(M.get(v))
+		F.makeMaterial(M.get(v).entityID)
 	);
 	
 	tMesh.position = v.clone().multiplySelf(S.scale).multiplySelf(G.flipY);
 	
 	tMesh.data = {};
-	tMesh.data.entityID = M.get(v);
+	tMesh.data.entityID = M.get(v).entityID;
 	tMesh.data.gridPosition = v;
 	
 	return tMesh;
