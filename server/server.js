@@ -1,10 +1,50 @@
-var F,S,V;
+var F,H,S,V;
 
 F = {};
 
+H = {};
+
+H.map = {};
+
+H.map.load = function(req,res) {
+	var mapLoaded;
+	
+	mapLoaded = function(err,data) {
+		data = data.toString('utf-8');
+		data = data
+			? JSON.parse(data)
+			: {};
+			
+		if (err) {
+			F.fail(res,'Failed to load map');
+		} else {
+			F.done(res,{
+				data: data,
+				msg: 'Map loaded'
+			});
+		}
+	};
+	
+	V.fs.readFile(S.dataPath+req.urlA.slice(-1)[0],mapLoaded);
+};
+
+H.map.save = function(req,res) {
+	var mapSaved;
+	
+	mapSaved = function(err) {
+		if (err) {
+			F.fail(res,'Failed to save map');
+		} else {
+			F.ok(res,'Map saved');
+		}
+	};
+	
+	V.fs.writeFile(S.dataPath+req.urlA.slice(-1)[0],JSON.stringify(req.data),mapSaved);
+};
+
 S = {
+	dataPath: 'data/',
 	host: '127.0.0.1',
-	mapFile: 'data/map.json',
 	port: 1337
 };
 
@@ -41,39 +81,33 @@ F.ok = function(res,msg) {
 };
 
 F.handle = function(req,res) {
-	var mapLoaded,mapSaved;
+	var found,head;
 	
-	mapLoaded = function(err,data) {
-		data = data.toString('utf-8');
-		data = data ?
-		JSON.parse(data)
-		: {};
-		if (err) {
-			F.fail(res,'Failed to load map');
-		} else {
-			F.done(res,{
-				data: data,
-		  msg: 'Map loaded'
-			});
+	found = false;
+	head = H;
+	
+	req.urlA = F.parsePath(req.url);
+	
+	req.urlA.forEach(function(v,k) {
+		if (!found && head[v]) head = head[v];
+		if (!found && (typeof head === 'function')) {
+			found = true;
+			head(req,res);
 		}
-	};
+	});
 	
-	mapSaved = function(err) {
-		if (err) {
-			F.fail(res,'Failed to save map');
-		} else {
-			F.ok(res,'Map saved');
-		}
-	};
+	if (!found) F.fail(res,'Unknown resource "'+req.urlA.join('/')+'"');
 	
-	if (req.data) {
-		V.fs.writeFile(S.mapFile,JSON.stringify(req.data),mapSaved);
-	} else {
-		V.fs.readFile(S.mapFile,mapLoaded);
-	}
+};
+
+F.parsePath = function(path) {
+	return path.split('/').filter(function(v) {
+		return v !== '';
+	});
 };
 
 V.http.createServer(function (req, res) {
+// 	console.log(req);
 	switch(req.method.toLowerCase()) {
 		case 'get':
 			F.handle(req,res);

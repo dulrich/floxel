@@ -10,7 +10,9 @@ F = {};
 G = {
 	activeEntity: undefined,
 	lighting: [],
+	mapfile: 'map.json',
 	mesh: new UTIL.Array3(S.mapSize),
+	meshFilled: false,
 	actionMode: MODES.select,
 	pan: new T.Vector3(0,0,0),
 	placeEntityID: -1,
@@ -33,18 +35,26 @@ F.debugInfo = function() {
 	}
 };
 
+F.emptyMesh = function() {
+	G.mesh.each(function(val,vec) {
+		R.scene.remove(val);
+		
+		G.mesh.set(vec,undefined);
+	});
+};
+
 F.flipY = function(vec) {
 	return vec.clone().multiplySelf(G.flipY);
 };
 
 F.initMeshFromMap = function() {
-	
 	M.each(function(val,vec) {
 		G.mesh.set(vec,F.meshFromMap(vec));
 		
 		if (G.mesh.get(vec)) R.scene.add(G.mesh.get(vec));
 	});
 	
+	G.meshFilled = true;
 };
 
 /* Setup Global Lighting and Skybox */
@@ -113,11 +123,13 @@ F.onMapLoaded = function(map) {
 	
 	M.init(map.data);
 	
+	if (G.meshFilled) F.emptyMesh();
+	
 	F.initMeshFromMap();
 	F.initWorld();
 };
 
-$.getJSON(S.server,F.onMapLoaded);
+$.getJSON(S.server+'/map/load/'+G.mapfile,F.onMapLoaded);
 
 window.setInterval(F.update, 1000 / 60);
 

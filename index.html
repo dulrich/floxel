@@ -58,6 +58,15 @@
 				</td>
 			</tr>
 			<tr>
+				<td class="debug-name">Mapfile</td>
+				<td class="debug-info">
+					<select class="debug-map-file">
+						<option>map.json</option>
+						<option>test.json</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
 				<td class="debug-name">Map</td>
 				<td class="debug-info">
 					<button class="debug-map-load">Load</button>
@@ -183,13 +192,19 @@
 			G.actionMode = parseInt($(this).data('mode'),10);
 		});
 		
+		$('.debug-map-file').change(function(e) {
+			G.mapfile = $(this).val();
+		});
+		
 		$('.debug-map-load').click(function(e) {
-			$.getJSON(S.server,function(d) {
+			$.getJSON(S.server+'/map/load/'+G.mapfile,function(d) {
 				console.log(d);
+				
+				F.onMapLoaded(d);
 			});
 		});
 		$('.debug-map-save').click(function(e) {
-			$.postJSON(S.server,M.a,function(d) {
+			$.postJSON(S.server+'/map/save/'+G.mapfile,M.a,function(d) {
 				console.log(d);
 			});
 		});
