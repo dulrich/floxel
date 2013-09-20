@@ -20,7 +20,7 @@ G = {
 };
 
 F.debugInfo = function() {
-	var i,info;
+	var i,info,inventory,inventoryID;
 	
 	info = [
 		['.debug-camera-position',UTIL.printV(R.camera.position)],
@@ -32,6 +32,33 @@ F.debugInfo = function() {
 	
 	for(i=0;i<info.length;i++) {
 		$debug.find(info[i][0]).html(info[i][1]);
+	}
+	
+	if (P.inventoryChanged) {
+		inventory = '';
+		
+		for(i=0;i<P.inventory.length;i++) {
+			inventoryID = P.inventory[i].entityID;
+			
+			inventory += '<li class="debug-inventory-item';
+			if (inventoryID === P.selectedEntityID)
+				inventory += ' debug-inventory-active';
+			inventory += '" data-entityID="'+inventoryID+'">';
+			inventory += entities[inventoryID].name + '(' + P.inventory[i].quantity + ')'
+			inventory += '</li>';
+		}
+		
+		$('.debug-inventory-container').html(inventory);
+		
+		$('.debug-inventory-item').click(function(e) {
+			$('.debug-inventory-item').removeClass('debug-inventory-active');
+			
+			$(this).addClass('debug-inventory-active');
+			
+			P.selectedEntityID = parseInt($(this).attr('data-entityID'),10);
+		});
+		
+		P.inventoryChanged = false;
 	}
 };
 
@@ -129,6 +156,8 @@ F.onMapLoaded = function(map) {
 	F.initWorld();
 };
 
+// set things up
+P.initInventory();
 $.getJSON(S.server+'/map/load/'+G.mapfile,F.onMapLoaded);
 
 window.setInterval(F.update, 1000 / 60);

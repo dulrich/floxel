@@ -75,6 +75,8 @@ E.mouseDown = function(e) {
 		M.set(grid,000);
 		
 		R.scene.remove(intersects[0].object);
+		
+		P.changeInventory(intersects[0].object.data.entityID,1);
 	};
 	
 	modeActions[0] = function() {
@@ -86,16 +88,20 @@ E.mouseDown = function(e) {
 	modeActions[1] = function() {
 		var grid;
 		
-		grid = intersects[0].object.data.gridPosition.clone();
-		
-		grid.addSelf(F.flipY(intersects[0].face.normal));
-		
-		M.set(grid,{
-			entityID: G.placeEntityID
-		});
-		
-		G.mesh.set(grid,F.meshFromMap(grid));
-		if (G.mesh.get(grid)) R.scene.add(G.mesh.get(grid));
+		if (P.selectedEntityID) {
+			grid = intersects[0].object.data.gridPosition.clone();
+			
+			grid.addSelf(F.flipY(intersects[0].face.normal));
+			
+			M.set(grid,{
+				entityID: P.selectedEntityID
+			});
+			
+			G.mesh.set(grid,F.meshFromMap(grid));
+			if (G.mesh.get(grid)) R.scene.add(G.mesh.get(grid));
+			
+			P.changeInventory(P.selectedEntityID,-1);
+		}
 	};
 	
 	if (intersects.length > 0) {
