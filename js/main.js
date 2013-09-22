@@ -109,25 +109,35 @@ F.makeMaterial = function(entityID) {
 	return entities[entityID].material;
 };
 
-F.meshFromMap = function(v) {
-	var tMesh,seg;
+F.meshFromMap = function(vec) {
+	var geometry,mapData,material,offset,seg,tMesh;
 	
-	F.requireType.Vector3(v);
+	F.requireType.Vector3(vec);
 	
-	if (!M.get(v)) return tMesh;
+	mapData = M.get(vec);
+	
+	if (!mapData) return tMesh;
+	
+	offset = new T.Vector3(0,0,0);
 	
 	seg = new T.Vector3(1,1,1);
 	
-	tMesh = new T.Mesh(
-		new T.CubeGeometry(S.scale.x,S.scale.y,S.scale.z,seg.x,seg.y,seg.z),
-		F.makeMaterial(M.get(v).entityID)
-	);
+	if (entities[mapData.entityID].opacity < 1) {
+		geometry = new T.PlaneGeometry(S.scale.x,S.scale.y,seg.x,seg.y);
+		offset = new T.Vector3(0,0,S.scale.z*0.4);
+	} else {
+		geometry = new T.CubeGeometry(S.scale.x,S.scale.y,S.scale.z,seg.x,seg.y,seg.z);
+	}
 	
-	tMesh.position = v.clone().multiplySelf(S.scale).multiplySelf(G.flipY);
+	material = F.makeMaterial(mapData.entityID);
+	
+	tMesh = new T.Mesh(geometry,material);
+	
+	tMesh.position = vec.clone().multiplySelf(S.scale).multiplySelf(G.flipY).addSelf(offset);;
 	
 	tMesh.data = {};
-	tMesh.data.entityID = M.get(v).entityID;
-	tMesh.data.gridPosition = v;
+	tMesh.data.entityID = mapData.entityID;
+	tMesh.data.gridPosition = vec;
 	
 	return tMesh;
 };
