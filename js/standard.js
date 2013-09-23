@@ -52,6 +52,11 @@ TYPE.conn = {
 	river: 1
 }
 
+TYPE.obj = {
+	entity: 0,
+	road: 1
+};
+
 /* VECTORS */
 VEC = {};
 

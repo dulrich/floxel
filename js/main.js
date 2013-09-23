@@ -143,6 +143,7 @@ F.meshFromMap = function(vec) {
 	tMesh.data = {};
 	tMesh.data.entityID = mapData.entityID;
 	tMesh.data.gridPosition = vec;
+	tMesh.data.type = TYPE.obj.entity;
 	
 	return tMesh;
 };
@@ -175,6 +176,12 @@ F.overlayFromMap = function(vec) {
 				});
 				
 				line = new T.Line(geometry,material,T.LineStrip);
+				
+				line.data = {};
+				line.data.overlayID = TYPE.conn.road;
+				line.data.gridPosition = vec;
+				line.data.level = connection.level;
+				line.data.type = TYPE.obj.road;
 				
 				R.scene.add(line);
 			}

@@ -82,7 +82,14 @@ E.mouseDown = function(e) {
 	};
 	
 	modeActions[0] = function() {
-		G.activeEntity = intersects[0];
+		var i;
+		
+		i = 0;
+		while (!G.activeEntity && i < intersects.length) {
+			if (intersects[i] && (intersects[i].object.data.type === TYPE.obj.entity))
+				G.activeEntity = intersects[i];
+			i++;
+		}
 		
 		G.activeEntity.object.material = E.selectedMaterial;
 	};
@@ -116,6 +123,8 @@ E.mouseDown = function(e) {
 				throw 'Active entity missing data.entityID';
 			
 			G.activeEntity.object.material = entities[G.activeEntity.object.data.entityID].material;
+			
+			delete G.activeEntity;
 		}
 		
 		modeActions[G.actionMode]();
