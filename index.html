@@ -73,6 +73,7 @@
 				<td class="debug-info">
 					<select class="debug-map-file">
 						<option>map.json</option>
+						<option>roads.json</option>
 						<option>test.json</option>
 					</select>
 				</td>
@@ -84,12 +85,19 @@
 					<button class="debug-map-save">Save</button>
 				</td>
 			</tr>
+			<tr>
+			<td class="debug-name">Road</td>
+			<td class="debug-info">
+				<button class="debug-road-start">Start</button>
+				<button class="debug-road-end">End</button>
+			</td>
+			</tr>
 		</table></div>
 
 	</body>
 	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-	<script type="text/javascript" src="lib/Three.js"></script>
+	<script type="text/javascript" src="lib/three.min.new.js"></script>
 	<script type="text/javascript" src="lib/Util.js"></script>
 	
 	<script type="text/javascript">
@@ -167,6 +175,7 @@
 	</script>
 	
 	<script type="text/javascript" src="js/settings.js"></script>
+	<script type="text/javascript" src="js/standard.js"></script>
 	<script type="text/javascript" src="js/entities.js"></script>
 	<script type="text/javascript" src="js/player.js"></script>
 	<script type="text/javascript" src="js/events.js"></script>
@@ -218,6 +227,13 @@
 			$.postJSON(S.server+'/map/save/'+G.mapfile,M.a,function(d) {
 				console.log(d);
 			});
+		});
+		
+		$('.debug-road-start').click(function(e) {
+			F.roadStart(G.activeEntity.object.data.gridPosition);
+		});
+		$('.debug-road-end').click(function(e) {
+			F.roadEnd(G.activeEntity.object.data.gridPosition);
 		});
 		
 	</script>

@@ -15,8 +15,7 @@ G = {
 	meshFilled: false,
 	actionMode: MODES.select,
 	pan: new T.Vector3(0,0,0),
-	placeEntityID: -1,
-	flipY: new T.Vector3(1,-1,1)
+	placeEntityID: -1
 };
 
 F.debugInfo = function() {
@@ -71,7 +70,7 @@ F.emptyMesh = function() {
 };
 
 F.flipY = function(vec) {
-	return vec.clone().multiplySelf(G.flipY);
+	return vec.clone().multiply(VEC.flipY);
 };
 
 F.initMeshFromMap = function() {
@@ -79,6 +78,8 @@ F.initMeshFromMap = function() {
 		G.mesh.set(vec,F.meshFromMap(vec));
 		
 		if (G.mesh.get(vec)) R.scene.add(G.mesh.get(vec));
+		
+		F.overlayFromMap(vec); // need to set global and add here
 	});
 	
 	G.meshFilled = true;
@@ -98,19 +99,29 @@ F.initWorld = function() {
 	});
 };
 
+F.makeGeometry = function(entityID) {
+	entities[entityID].geometry = entities[entityID].geometry || GEO.cube;
+	
+	return entities[entityID].geometry;
+};
+
 F.makeMaterial = function(entityID) {
 	entities[entityID].material =
-	entities[entityID].material ||
-	new T.MeshLambertMaterial({
-		color: entities[entityID].color,
-		opacity: U.def(entities[entityID].opacity,1),
-		transparent: (U.E(entities[entityID].opacity) && entities[entityID].opacity < 1)
-	})
+		entities[entityID].material ||
+		new T.MeshLambertMaterial({
+			color: entities[entityID].color,
+			opacity: U.def(entities[entityID].opacity,1),
+			transparent: (U.E(entities[entityID].opacity) && entities[entityID].opacity < 1)
+		});
 	return entities[entityID].material;
 };
 
+F.makePosition = function(entityID) {
+	return entities[entityID].position || VEC.origin;
+};
+
 F.meshFromMap = function(vec) {
-	var geometry,mapData,material,offset,seg,tMesh;
+	var geometry,mapData,material,position,tMesh;
 	
 	F.requireType.Vector3(vec);
 	
@@ -118,22 +129,16 @@ F.meshFromMap = function(vec) {
 	
 	if (!mapData) return tMesh;
 	
-	offset = new T.Vector3(0,0,0);
-	
-	seg = new T.Vector3(1,1,1);
-	
-	if (entities[mapData.entityID].opacity < 1) {
-		geometry = new T.PlaneGeometry(S.scale.x,S.scale.y,seg.x,seg.y);
-		offset = new T.Vector3(0,0,S.scale.z*0.4);
-	} else {
-		geometry = new T.CubeGeometry(S.scale.x,S.scale.y,S.scale.z,seg.x,seg.y,seg.z);
-	}
-	
+	geometry = F.makeGeometry(mapData.entityID);
 	material = F.makeMaterial(mapData.entityID);
+	position = F.makePosition(mapData.entityID);
 	
 	tMesh = new T.Mesh(geometry,material);
 	
-	tMesh.position = vec.clone().multiplySelf(S.scale).multiplySelf(G.flipY).addSelf(offset);;
+	tMesh.position = vec.clone()
+		.multiply(S.scale)
+		.multiply(VEC.flipY)
+		.add(position);
 	
 	tMesh.data = {};
 	tMesh.data.entityID = mapData.entityID;
@@ -142,14 +147,92 @@ F.meshFromMap = function(vec) {
 	return tMesh;
 };
 
+F.overlayFromMap = function(vec) {
+	var center,connection,geometry,line,mapData,material;
+	
+	F.requireType.Vector3(vec);
+	
+	mapData = M.get(vec);
+	
+	if (!mapData) return;
+	
+	center = vec.clone()
+		.multiply(S.scale)
+		.multiply(VEC.flipY)
+		.add(VEC.z60pct);
+	
+	if (mapData.connections) {
+		for(i=0;i<mapData.connections.length;i++) {
+			if ((connection = mapData.connections[i]) && connection.type === TYPE.conn.road) {
+				geometry = new T.Geometry();
+				
+				geometry.vertices.push(center);
+				geometry.vertices.push(DIR.vec(i).clone().multiply(S.scale).multiplyScalar(0.5).add(center));
+				
+				material = new THREE.LineBasicMaterial({
+					color: 0x451500,
+					linewidth: 5
+				});
+				
+				line = new T.Line(geometry,material,T.LineStrip);
+				
+				R.scene.add(line);
+			}
+		}
+	}
+};
+
 F.requireType = {};
 
 F.requireType.Vector3 = function(v) {
 	if (!(v instanceof T.Vector3)) throw 'v must be a THREE.Vector3';
 };
 
+F.roadEnd = function(vec) {
+	if (!G.roadStart)  throw 'Road must be started first';
+	
+	F.roadFromTo(G.roadStart,vec,1);
+	
+	delete G.roadStart;
+};
+
+F.roadFromTo = function(start,end,level) {
+	var mapData,road;
+	
+	road = end.clone()
+		.sub(start)
+		.multiply(VEC.flipY);
+	
+	mapData = M.get(start);
+	
+	mapData.connections = mapData.connections || new Array(8);
+	
+	mapData.connections[DIR.int(road)] = {
+		level: level,
+		type: TYPE.conn.road
+	};
+	
+	M.set(start,mapData);
+	
+	road.multiply(VEC.flipAll);
+	mapData = M.get(end);
+	
+	mapData.connections = mapData.connections || new Array(8);
+	
+	mapData.connections[DIR.int(road)] = {
+		level: level,
+		type: TYPE.conn.road
+	};
+	
+	M.set(end,mapData);
+};
+
+F.roadStart = function(vec) {
+	G.roadStart = vec;
+};
+
 F.update = function() {
-// 	camera.position.addSelf(
+// 	camera.position.add(
 	R.camera.position.x += G.pan.x;
 	R.camera.position.y += -G.pan.y;
 	R.camera.position.z += G.pan.z;

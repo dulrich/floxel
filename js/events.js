@@ -72,7 +72,9 @@ E.mouseDown = function(e) {
 		
 		grid = intersects[0].object.data.gridPosition;
 		
-		M.set(grid,000);
+		M.set(grid,{
+			entityID: 000
+		});
 		
 		R.scene.remove(intersects[0].object);
 		

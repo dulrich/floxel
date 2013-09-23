@@ -1,4 +1,4 @@
-var entities;
+var entities,overlays;
 
 entities = [];
 
@@ -38,8 +38,21 @@ entities[300] = {
 
 entities[400] = {
 	color: 0x0000CC,
+	geometry: GEO.plane,
 	name: 'Water',
-	opacity: 0.5
+	opacity: 0.5,
+	position: VEC.z40pct
 };
 
 
+overlays = {};
+
+overlays[TYPE.conn.road] = [
+	{ // level 0
+		
+	},
+	{ // level 1
+		color: 0x451500,
+		linewidth: 5
+	}
+];

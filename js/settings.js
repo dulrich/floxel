@@ -1,4 +1,5 @@
 var S = {
+	detail: new T.Vector3(1,1,1),
 	flags: {
 		DEBUG: true,
 	},
