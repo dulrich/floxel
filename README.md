@@ -1,10 +1,9 @@
-floxel
-======
+# floxel #
 
 Simple voxel based strategy game engine
 
-Running the Server
-======
+
+# Running the Server #
 
 Setup floxel or another host name in your /etc/hosts and create a matching
 web server. If you use a host other than floxel you will need to update the 
@@ -36,10 +35,9 @@ Then, run the map server, in the server directory of the repo:
 node PATH_TO_FLOXEL/server/server.js
 ```
 
-license
-=======
+# license #
 
-Floxel is copyright (C) 2014 by David Ulrich.
+Floxel is copyright (C) 2014 - 2015  by David Ulrich.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
