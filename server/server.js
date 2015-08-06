@@ -41,7 +41,10 @@ H.map.load = function(req,res) {
 		}
 	};
 	
-	V.fs.readFile(S.dataPath+req.urlA.slice(-1)[0],mapLoaded);
+	V.fs.readFile(
+		V.path.join(S.basePath,S.dataPath,req.urlA.slice(-1)[0]),
+		mapLoaded
+	);
 };
 
 H.map.save = function(req,res) {
@@ -55,18 +58,24 @@ H.map.save = function(req,res) {
 		}
 	};
 	
-	V.fs.writeFile(S.dataPath+req.urlA.slice(-1)[0],JSON.stringify(req.data),mapSaved);
+	V.fs.writeFile(
+		V.path.join(S.basePath,S.dataPath,req.urlA.slice(-1)[0]),
+		JSON.stringify(req.data),
+		mapSaved
+	);
 };
 
 S = {
-	dataPath: 'data/',
-	host: '127.0.0.1',
+	basePath: "/code/floxel",
+	dataPath: "server/data",
+	host: "127.0.0.1",
 	port: 1337
 };
 
 V = {
 	fs: require('fs'),
-	http: require('http')
+	http: require('http'),
+	path: require("path")
 };
 
 F.done = function(res,opt) {
@@ -144,4 +153,6 @@ V.http.createServer(function (req, res) {
 		default:
 			server.fail(res,'Unsupported request type');
 	}
-}).listen(S.port,S.host);
+}).listen(S.port,S.host,function() {
+	console.log("Floxel server started ["+S.host+":"+S.port+"]");
+});

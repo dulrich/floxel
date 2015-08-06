@@ -14,7 +14,7 @@ server {
 	server_name floxel;
 	
 	location / {
-		alias /web/floxel/;
+		alias /code/floxel/;
 	}
 	
 	location /server/ {
@@ -29,15 +29,12 @@ server {
 }
 ```
 
-Then, run the map server, in the server directory of the repo: 
+Then, run the map server: `node server/server.js`
 
-```
-node PATH_TO_FLOXEL/server/server.js
-```
 
 # license #
 
-Floxel is copyright (C) 2014 - 2015  by David Ulrich.
+Floxel is copyright (C) 2014 - 2015  David Ulrich.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
